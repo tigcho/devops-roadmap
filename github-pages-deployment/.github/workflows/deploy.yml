@@ -30,7 +30,7 @@ jobs:
       - name: Upload artifact to GitHub Pages
         uses: actions/upload-pages-artifact@v3
         with:
-          path: github-pages-deployment
+          path: .
 
       - name: Deploy to GitHub Pages
         id: deployment
