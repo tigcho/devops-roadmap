@@ -1,0 +1,14 @@
+[Unit]
+Description=Dummy Background Service
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/dummy.sh
+Restart=always
+RestartSec=5s
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=dummy-service
+
+[Install]
+WantedBy=multi-user.target
