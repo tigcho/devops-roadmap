@@ -10,7 +10,7 @@
 8. [Simple Monitoring](https://roadmap.sh/projects/simple-monitoring-dashboard)
 9. [Dummy Systemd Service](https://roadmap.sh/projects/dummy-systemd-service)
 10. [Basic Dockerfile](https://roadmap.sh/projects/basic-dockerfile)
-11. EC2 Instance
+11. [EC2 Instance](https://roadmap.sh/projects/ec2-instance)
 12. Configuration Management
 13. IaC on DigitalOcean
 14. Node.js Service Deployment
