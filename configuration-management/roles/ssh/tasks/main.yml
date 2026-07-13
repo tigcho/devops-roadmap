@@ -1,0 +1,14 @@
+---
+- name: Create SSH directory
+  file:
+    path: ~/.ssh
+    state: directory
+    mode: '0700'
+
+- name: Add public key
+  ansible.builtin.lineinfile:
+    path: ~/.ssh/authorized_keys
+    line: "{{ ssh_public_key }}"
+    create: yes
+    mode: '0600'
+  when: ssh_public_key is defined
