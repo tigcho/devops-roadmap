@@ -1,0 +1,7 @@
+---
+webservers:
+  hosts:
+    digitalocean-droplet:
+      ansible_host: ${droplet_ip}
+      ansible_user: root
+      ansible_port: 22

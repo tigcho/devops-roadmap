@@ -1,0 +1,5 @@
+do_token           = "your_digitalocean_api_token"
+ssh_public_key_path = "~/.ssh/id_rsa.pub"
+droplet_name       = "my-droplet"
+droplet_region     = "ams3"
+droplet_size       = "s-1vcpu-2gb"
