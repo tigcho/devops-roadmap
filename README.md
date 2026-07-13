@@ -17,9 +17,11 @@
 15. Dockerized Service
 16. Multi-Container Application
 17. Automated DB Backups
-18. Blue-Green Deployment
-19. Prometheus and Grafana
-20. Multi-Service Application
-21. Service Discovery
+18. Bastion Host
+19. [File Integrity Checker](https://roadmap.sh/projects/file-integrity-checker)
+20. Blue-Green Deployment
+21. Prometheus and Grafana
+22. Multi-Service Application
+23. Service Discovery
 
 View all projects on [roadmap.sh](https://roadmap.sh/devops/projects)
