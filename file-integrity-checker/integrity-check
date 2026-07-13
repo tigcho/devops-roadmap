@@ -1,0 +1,166 @@
+#!/usr/bin/env python3
+import os
+import sys
+import json
+import hashlib
+from pathlib import Path
+from datetime import datetime
+
+DB_DIR = Path.home() / ".integrity-check"
+DB_FILE = DB_DIR / "db.json"
+
+def compute_hash(filepath):
+    sha256 = hashlib.sha256()
+    with open(filepath, 'rb') as f:
+        for chunk in iter(lambda: f.read(4096), b''):
+            sha256.update(chunk)
+    return sha256.hexdigest()
+
+def load_db():
+    if DB_FILE.exists():
+        with open(DB_FILE, 'r') as f:
+            return json.load(f)
+    return {"files": {}, "last_updated": None}
+
+def save_db(db):
+    DB_DIR.mkdir(mode=0o700, exist_ok=True)
+    DB_FILE.touch(mode=0o600)
+    with open(DB_FILE, 'w') as f:
+        json.dump(db, f, indent=2)
+
+def get_log_files(path):
+    path = Path(path).resolve()
+    if path.is_file():
+        return [path]
+    elif path.is_dir():
+        patterns = ['*.log', '*.log.*', '*_log', 'syslog*', 'auth*', 'messages*', '*.syslog']
+        files = []
+        for pattern in patterns:
+            files.extend(path.glob(pattern))
+        seen = set()
+        unique_files = []
+        for f in files:
+            if f.is_file() and str(f) not in seen:
+                seen.add(str(f))
+                unique_files.append(f)
+        return unique_files
+    return []
+
+def init_command(path):
+    db = load_db()
+    files = get_log_files(path)
+
+    if not files:
+        print(f"No log files found in {path}")
+        return 1
+
+    for filepath in files:
+        try:
+            file_hash = compute_hash(filepath)
+            db["files"][str(filepath)] = {
+                "hash": file_hash,
+                "last_checked": datetime.now().isoformat()
+            }
+            print(f"Hashed: {filepath}")
+        except Exception as e:
+            print(f"Error hashing {filepath}: {e}", file=sys.stderr)
+
+    db["last_updated"] = datetime.now().isoformat()
+    save_db(db)
+    print(f"\nHashes stored successfully for {len(files)} file(s).")
+    return 0
+
+def check_command(path):
+    db = load_db()
+
+    if not db["files"]:
+        print("No hashes stored. Run 'integrity-check init' first.")
+        return 1
+
+    files = get_log_files(path)
+    if not files:
+        print(f"No log files found in {path}")
+        return 1
+
+    mismatched = []
+    for filepath in files:
+        filepath_str = str(filepath)
+        if filepath_str not in db["files"]:
+            print(f"{filepath}: Status: New file (not in database)")
+            continue
+
+        try:
+            current_hash = compute_hash(filepath)
+            stored_hash = db["files"][filepath_str]["hash"]
+
+            if current_hash == stored_hash:
+                print(f"{filepath}: Status: Unmodified")
+            else:
+                print(f"{filepath}: Status: MODIFIED (Hash mismatch)")
+                mismatched.append(filepath_str)
+        except Exception as e:
+            print(f"Error checking {filepath}: {e}", file=sys.stderr)
+
+    if mismatched:
+        print(f"\nWARNING: {len(mismatched)} file(s) modified!")
+        return 1
+    return 0
+
+def update_command(path):
+    db = load_db()
+    files = get_log_files(path)
+
+    if not files:
+        print(f"No log files found in {path}")
+        return 1
+
+    updated = 0
+    for filepath in files:
+        filepath_str = str(filepath)
+        try:
+            file_hash = compute_hash(filepath)
+            db["files"][filepath_str] = {
+                "hash": file_hash,
+                "last_checked": datetime.now().isoformat()
+            }
+            print(f"Updated: {filepath}")
+            updated += 1
+        except Exception as e:
+            print(f"Error updating {filepath}: {e}", file=sys.stderr)
+
+    db["last_updated"] = datetime.now().isoformat()
+    save_db(db)
+    print(f"\nHash updated successfully for {updated} file(s).")
+    return 0
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: integrity-check <init|check|update> <path>")
+        print("  init <path>   - Initialize and store hashes")
+        print("  check <path>  - Check file integrity")
+        print("  update <path> - Update stored hashes")
+        sys.exit(1)
+
+    command = sys.argv[1].lower()
+    path = sys.argv[2] if len(sys.argv) > 2 else None
+
+    if not path:
+        print("Error: Path required")
+        sys.exit(1)
+
+    if not Path(path).exists():
+        print(f"Error: Path does not exist: {path}")
+        sys.exit(1)
+
+    if command == "init":
+        sys.exit(init_command(path))
+    elif command == "check":
+        sys.exit(check_command(path))
+    elif command == "update":
+        sys.exit(update_command(path))
+    else:
+        print(f"Unknown command: {command}")
+        sys.exit(1)
+
+if __name__ == "__main__":
+    main()

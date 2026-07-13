@@ -1,0 +1,5 @@
+Jan 13 08:00:00 server kernel: [    0.000000] Linux version 6.1.0
+Jan 13 08:00:01 server sshd[1234]: Accepted publickey for user from 192.168.1.100
+Jan 13 08:05:23 server cron[5678]: (root) CMD (logrotate)
+Jan 13 08:10:45 server kernel: [UFW BLOCK] IN=eth0 SRC=10.0.0.55
+Jan 13 09:30:00 hacker ATTACK: SQL injection attempt detected
