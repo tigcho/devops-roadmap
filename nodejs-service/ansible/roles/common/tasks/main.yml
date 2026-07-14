@@ -1,0 +1,36 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: Install system dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - gnupg
+      - python3
+      - python3-pip
+      - git
+    state: present
+
+- name: Add NodeSource repository for Node.js
+  shell: |
+    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+  args:
+    warn: false
+    creates: /etc/apt/sources.list.d/nodesource.list
+
+- name: Install Node.js and npm
+  apt:
+    name:
+      - nodejs
+    state: present
+    update_cache: yes
+
+- name: Install PM2 globally
+  npm:
+    name: pm2
+    global: yes

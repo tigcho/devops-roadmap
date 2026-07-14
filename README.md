@@ -13,7 +13,7 @@
 11. [EC2 Instance](https://roadmap.sh/projects/ec2-instance)
 12. [Configuration Management](https://roadmap.sh/projects/configuration-management)
 13. [IaC on DigitalOcean](https://roadmap.sh/projects/iac-digitalocean)
-14. Node.js Service Deployment
+14. [Node.js Service Deployment](https://roadmap.sh/projects/nodejs-service-deployment)
 15. Dockerized Service
 16. Multi-Container Application
 17. Automated DB Backups

@@ -1,0 +1,6 @@
+---
+- name: Deploy Node.js service
+  hosts: webservers
+  become: yes
+  roles:
+    - app

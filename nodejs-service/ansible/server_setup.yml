@@ -1,0 +1,6 @@
+---
+- name: Setup Node.js server
+  hosts: webservers
+  become: yes
+  roles:
+    - common

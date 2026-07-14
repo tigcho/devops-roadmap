@@ -1,0 +1,37 @@
+---
+- name: Create app directory
+  file:
+    path: /opt/nodejs-service
+    state: directory
+    mode: '0755'
+
+- name: Clone repository
+  git:
+    repo: "{{ app_repository }}"
+    dest: /opt/nodejs-service
+    force: yes
+    version: main
+
+- name: Install dependencies
+  npm:
+    path: /opt/nodejs-service
+    production: no
+
+- name: Start application with PM2
+  shell: |
+    cd /opt/nodejs-service
+    pm2 delete nodejs-service || true
+    pm2 start server.js --name nodejs-service
+  args:
+    warn: false
+
+- name: Save PM2 process list
+  shell: pm2 save
+  args:
+    warn: false
+
+- name: Setup PM2 to start on boot
+  shell: pm2 startup systemd -hp root --user root
+  args:
+    warn: false
+  ignore_errors: yes

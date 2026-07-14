@@ -1,0 +1,16 @@
+{
+  "name": "nodejs-service",
+  "version": "1.0.0",
+  "description": "Simple Node.js service for practice",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "build": "echo 'No build step needed'"
+  },
+  "keywords": ["nodejs", "ci-cd"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

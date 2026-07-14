@@ -1,0 +1,39 @@
+name: Deploy with Ansible
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Create SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.DROPLET_IP }} >> ~/.ssh/known_hosts
+
+      - name: Update Ansible inventory
+        run: |
+          sed -i "s/YOUR_DROPLET_IP/${{ secrets.DROPLET_IP }}/" ansible/inventory.ini
+
+      - name: Update repository URL
+        run: |
+          sed -i "s|https://github.com/YOUR_USERNAME/YOUR_REPO.git|${{ github.repositoryUrl }}|g" ansible/roles/app/defaults/main.yml
+
+      - name: Run Ansible playbook
+        run: |
+          cd ansible
+          ansible-playbook node_service.yml --tags app
